@@ -44,7 +44,7 @@ namespace TicketApplication
         _display.PaymentButtonPressed();
       });
 
-      bool fullPrice = true;
+      var fullPrice = true;
       _paymentProcessorDriver = _messenger.GetEventStream<PaymentReceivedEvent>()
         .Subscribe(e =>
       {
@@ -60,7 +60,7 @@ namespace TicketApplication
           toAddCoins = toAddCoins - 1;
         }
 
-        //fullPrice = !fullPrice;
+        fullPrice = !fullPrice;
         for (var i = 0; i < toAddCoins; i++)
         {
           _paymentProcessor.AddCoin();
