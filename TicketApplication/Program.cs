@@ -6,7 +6,9 @@ namespace TicketApplication
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+          var app = new AppBootstrapper();
+          app.Start();
+          Console.ReadLine();
         }
     }
 }
