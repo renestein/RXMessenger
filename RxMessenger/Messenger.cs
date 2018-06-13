@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Threading;
@@ -8,28 +9,28 @@ namespace RxMessenger
 {
   public class Messenger : IDisposable
   {
-    private readonly Subject<Object> _events;
+    private readonly Subject<Object> _subject;
     private bool _isDisposed;
-    private TaskFactory _taskForPublishFactory;
+    private readonly IObservable<object> _events;
 
     public Messenger()
     {
-      _events = new Subject<object>();
+      _subject = new Subject<object>();
+      _events = _subject.ObserveOn(CurrentThreadScheduler.Instance);
+
       _isDisposed = false;
-      _taskForPublishFactory = new TaskFactory(new ConcurrentExclusiveSchedulerPair().ExclusiveScheduler);
     }
 
     public void Dispose()
     {
-      _events.Dispose();
+      _subject.Dispose();
       _isDisposed = true;
     }
 
     public void PublishEvent<TEvent>(TEvent newEvent)
     {
       throwIfDisposed();
-      _taskForPublishFactory.StartNew(() => _events.OnNext(newEvent),
-        TaskCreationOptions.None);
+      _subject.OnNext(newEvent);
     }
 
     public IObservable<TEvent> GetEventStream<TEvent>()
